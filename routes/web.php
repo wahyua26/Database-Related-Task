@@ -5,6 +5,10 @@ use App\Http\Controllers\DosenController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\FormulirController;
+use App\Http\Controllers\ArticleController;
+
+use App\Models\Category;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -89,3 +93,35 @@ Route::get('/dashboard',function(){
 
 Route::get('/input-form-di-laravel', [FormulirController::class, 'input']);
 Route::post('/proses-form-di-laravel', [FormulirController::class, 'proses']);
+
+Route::get("/article", [ArticleController::class, 'index']);
+Route::get('/article/{article:slug}', [ArticleController::class, 'content']);
+
+Route::get('/categories', function()
+{
+    return view('categories', [
+        'categories' => Category::all()
+    ]);
+});
+
+Route::get('/categories/{category:slug}', function(category $category){
+    return view('article', [
+        'title' => $category->name,
+        'articles' => $category->articles->load('author', 'category'),
+        'category' => $category->name
+    ]);
+});
+
+Route::get('/authors/{author:username}', function(User $author){
+    return view('article', [
+        'title' => $author->name,
+        'articles' => $author->articles->load('author', 'category')
+    ]);
+});
+
+Route::get('/authors', function()
+{
+    return view('authors', [
+        'authors' => User::all()
+    ]);
+});
